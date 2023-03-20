@@ -23,3 +23,8 @@ class FunctionUseCase {
 
 module.exports = FunctionUseCase
 ```
+
+Running:
+```js
+npm run start
+```

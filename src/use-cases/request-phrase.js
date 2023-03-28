@@ -16,13 +16,4 @@ async function requestPhrase(term) {
 	}
 }
 
-// -------- just test
-// requestPhrase('amor frases')
-// 	.then(frase => {
-// 		console.log(frase)
-// 	})
-// 	.catch(err => {
-// 		console.error(err)
-// 	})
-
 module.exports = { requestPhrase }

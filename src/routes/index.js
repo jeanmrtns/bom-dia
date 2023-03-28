@@ -6,11 +6,13 @@ const routes = express.Router()
 
 routes.post("/custom-image", async (req, res) => {
   const { imageTheme } = req.body
+  const { term } = req.query
   const requestImage = new RequestImage()
   const manageImage = new ManageImage()
-
+  
+  const phrase = await requestPhrase(term)
   await requestImage.execute(imageTheme)
-  await manageImage.execute()
+  await manageImage.execute(phrase)
 
 	return res.status(200).json({ status: 'ok' })
 })

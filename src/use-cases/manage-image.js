@@ -1,8 +1,9 @@
+const { createCanvas, loadImage } = require("canvas");
+const fs = require("fs");
+
 class ManageImage {
     
     async execute(){
-        const fs = require("fs");
-        const { createCanvas, loadImage } = require("canvas");
 
         try {
             loadImage("./tmp/output.png").then((image) => {

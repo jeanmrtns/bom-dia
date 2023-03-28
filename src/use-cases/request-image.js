@@ -8,8 +8,7 @@ class RequestImage {
       query: imageTheme,
       per_page: 100
     })
-
-    const randomImageIndex = Math.floor(Math.random() * 100)
+    const randomImageIndex = Math.floor(Math.random() * 100) % photos.photos.length
 
     const photo = await pexels.photos.show({ id: photos.photos[randomImageIndex].id })
 

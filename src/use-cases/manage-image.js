@@ -10,8 +10,6 @@ class ManageImage {
         try {
             loadImage("./tmp/output.png").then((image) => {
                 
-                // phrase = 'O amor começa quando uma pessoa se sente só e termina quando uma pessoa deseja estar só.'
-                // phrase = 'Se você fosse uma música seria as melhores notas'
                 console.log(phrase);
                 let lines = phrase.match(/.{1,35}(\s|$)/g);
                 let new_phrase = lines.join("\n");

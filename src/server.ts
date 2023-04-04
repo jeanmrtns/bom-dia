@@ -1,7 +1,7 @@
 require('dotenv').config()
-const express = require("express")
-const cors = require("cors")
-const routes = require("./routes/index")
+import express from 'express'
+import cors from 'cors'
+import { routes } from './routes'
 
 const PORT = 3333
 

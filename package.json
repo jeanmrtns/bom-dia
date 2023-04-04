@@ -14,8 +14,8 @@
     "request": "^2.88.2"
   },
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "build": "tsup src",
+    "dev": "tsx src/server.js",
+    "build": "tsup src/server.js",
     "start": "node dist/server.js"
   },
   "devDependencies": {

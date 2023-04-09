@@ -22,6 +22,11 @@ export class FunctionUseCase {
 }
 ```
 
+Installing packages:
+```js
+npm install
+```
+
 Running:
 ```js
 npm run dev

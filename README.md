@@ -26,3 +26,15 @@ Running:
 ```js
 npm run dev
 ```
+
+On HTTP client:
+
+Request to: POST <code>http://localhost:&lt;PORT&gt;/custom-image</code>
+```json
+{
+    "imageTheme": "fire",
+    "term": "Jesus frases" // Recommended using THEME + frases
+}
+```
+
+Images will be stored in /tmp folder.

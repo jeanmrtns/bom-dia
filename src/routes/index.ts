@@ -11,7 +11,7 @@ routes.post("/custom-image", async (req, res) => {
   const manageImage = new ManageImage()
   const requestPhrase = new RequestPhrase()
   
-  const phrase = await requestPhrase.execute(term)  
+  const phrase = await requestPhrase.execute(term)
   await requestImage.execute(imageTheme)  
   await manageImage.execute(phrase)
 

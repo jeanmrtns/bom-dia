@@ -2,6 +2,8 @@ import express from 'express'
 import { RequestImage } from '../use-cases/request-image'
 import { RequestPhrase } from '../use-cases/request-phrase'
 import { ManageImage } from '../use-cases/manage-image'
+import jwt from 'jsonwebtoken';
+import { PrismaClient, Prisma } from '@prisma/client'
 
 const routes = express.Router()
 
@@ -19,7 +21,74 @@ routes.post("/custom-image", async (req, res) => {
 })
 
 routes.post("/user", async (req, res) => {
-  // TODO
+  try {
+    const prisma = new PrismaClient()
+    const user = await prisma.user.create({
+      data: req.body,
+    })
+    return res.status(200).json(user)  
+  }
+  catch (err) {
+    return res.status(500).json({mensagem: "Não foi possível cadastrar o usuário.", erro: err})  
+  }
 })
+
+routes.get("/user", async (req, res) => {
+  const prisma = new PrismaClient()
+  const users = await prisma.user.findMany()
+  return res.status(200).json(users)
+})
+
+routes.post('/login', async (req, res) => {
+  const prisma = new PrismaClient()
+  const user = await prisma.user.findUnique({where: {phone: req.body.phone}})
+  
+  if (!user) {
+    return res.status(404).json({message: 'Telefone não encontrado!'});
+  }
+
+  if(req.body.phone === user.phone && req.body.password === user.password){
+    const id = user.id
+    const token = jwt.sign({ id }, String(process.env.SECRET), {
+      expiresIn: 3600 // expires in 1 hour
+    });
+    return res.json({ auth: true, token: token });
+  }
+  
+  res.status(500).json({message: 'Login inválido!'});
+})
+
+routes.put('/user/:id', async (req, res) => {
+  const result = await auth(req.headers['authorization'])
+  if (!result.auth) {
+    return res.status(500).json(result.message);
+  } 
+
+  const prisma = new PrismaClient()
+  const updateUser = await prisma.user.update({
+    where: {
+      id: parseInt(req.params.id),
+    },
+    data: {
+      phone: req.body.phone,
+      name: req.body.name,
+      pictureTheme: req.body.pictureTheme,
+      phraseTheme: req.body.phraseTheme
+    },
+  })
+  return res.status(200).json(updateUser);
+})
+
+async function auth(token: string | undefined) {
+  if (token) {
+    jwt.verify(token.split(' ')[1], String(process.env.SECRET), function(err, decoded) {
+      if (err) return { auth: false, message: 'Token não aceito.' }
+    })
+  }
+  else {
+    return { auth: false, message: 'Sem token de autenticação.' }
+  }
+  return { auth: true, message: 'Usuário autorizado.' }
+}
 
 export { routes }

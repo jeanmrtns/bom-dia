@@ -43,3 +43,23 @@ Request to: POST <code>http://localhost:&lt;PORT&gt;/custom-image</code>
 ```
 
 Images will be stored in /tmp folder.
+
+---
+
+## WEB
+Enter web folder
+```bash
+cd web
+```
+
+Installing packages:
+```bash
+npm install
+```
+
+Running:
+```bash
+npm run dev
+```
+
+App will be available at http://localhost:3000 if the port 3000 is available, otherwise will use the next port e.g 3001

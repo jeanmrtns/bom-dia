@@ -1,8 +1,48 @@
+import { useRouter } from 'next/navigation'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { api } from '@/lib/api'
+import { toast } from 'react-toastify'
+import { setCookie } from 'nookies'
+
 interface LoginProps {
   onChangePage(page: string): void
 }
 
+interface LoginResponse {
+  auth: boolean
+  token: string
+}
+
+const loginSchema = z.object({
+  phone: z.string().min(6),
+  password: z.string().min(6),
+})
+
+type LoginData = z.infer<typeof loginSchema>
+
 export function Login({ onChangePage }: LoginProps) {
+  const router = useRouter()
+  const { register, handleSubmit } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  async function onSubmit(data: LoginData) {
+    const response = await api.post<LoginResponse>('/login', data)
+    const { token } = response.data
+    toast.success(
+      'Login realizado. Por favor aguarde enquanto te redirecionamos.',
+    )
+
+    setCookie(null, '@bomdia:token', token, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '*',
+    })
+
+    router.push('/account')
+  }
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center  px-6 py-12 lg:px-8">
@@ -16,7 +56,7 @@ export function Login({ onChangePage }: LoginProps) {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label
                 htmlFor="phone"
@@ -27,7 +67,7 @@ export function Login({ onChangePage }: LoginProps) {
               <div className="mt-2">
                 <input
                   id="phone"
-                  name="phone"
+                  {...register('phone')}
                   type="tel"
                   autoComplete="phone"
                   placeholder="(00) 00000-0000"
@@ -50,7 +90,7 @@ export function Login({ onChangePage }: LoginProps) {
               <div className="mt-2">
                 <input
                   id="password"
-                  name="password"
+                  {...register('password')}
                   type="password"
                   autoComplete="current-password"
                   required

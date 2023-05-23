@@ -1,10 +1,18 @@
-import {z} from 'zod'
+import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/lib/api'
+import { toast } from 'react-toastify'
+import router from 'next/router'
+import { setCookie } from 'nookies'
 
 interface RegisterProps {
   onChangePage(page: string): void
+}
+
+interface RegisterResponse {
+  auth: boolean
+  token: string
 }
 
 const registerSchema = z.object({
@@ -18,15 +26,22 @@ const registerSchema = z.object({
 type RegisterData = z.infer<typeof registerSchema>
 
 export function Register({ onChangePage }: RegisterProps) {
-
   const { register, handleSubmit } = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema)
+    resolver: zodResolver(registerSchema),
   })
 
   async function onSubmit(data: RegisterData) {
-    console.log(data)
-    await api.post('/user', data)
-    alert('Foi')
+    const response = await api.post<RegisterResponse>('/user', data)
+    const { token } = response.data
+    toast.success(
+      'Registro realizado. Por favor aguarde enquanto te redirecionamos.',
+    )
+    setCookie(null, '@bomdia:token', token, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '*',
+    })
+
+    router.push('/account')
   }
 
   return (

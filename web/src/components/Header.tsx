@@ -1,10 +1,12 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import * as Avatar from '@radix-ui/react-avatar'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import sun from '@/assets/sun.webp'
 import Image from 'next/image'
 import Link from 'next/link'
+import { destroyCookie, parseCookies } from 'nookies'
+import { useRouter } from 'next/navigation'
 
 const navigation = [{ name: 'Configurações', href: '/account', current: true }]
 
@@ -13,6 +15,20 @@ function classNames(...classes: any) {
 }
 
 export default function Header() {
+  const router = useRouter()
+  const cookies = parseCookies()
+
+  async function handleSignOut() {
+    destroyCookie(null, '@bomdia:token')
+    router.push('/')
+  }
+
+  useEffect(() => {
+    if (!cookies['@bomdia:token']) {
+      router.push('/')
+    }
+  }, [cookies, router])
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -123,7 +139,8 @@ export default function Header() {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            href="/"
+                            href="#"
+                            onClick={handleSignOut}
                             className={classNames(
                               active ? 'bg-gray-100' : '',
                               'block px-4 py-2 text-sm text-gray-700',

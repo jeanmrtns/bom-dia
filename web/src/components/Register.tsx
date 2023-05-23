@@ -1,8 +1,34 @@
+import {z} from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { api } from '@/lib/api'
+
 interface RegisterProps {
   onChangePage(page: string): void
 }
 
+const registerSchema = z.object({
+  name: z.string().min(6),
+  phone: z.string().min(6),
+  password: z.string().min(6),
+  pictureTheme: z.string().min(6),
+  phraseTheme: z.string().min(6),
+})
+
+type RegisterData = z.infer<typeof registerSchema>
+
 export function Register({ onChangePage }: RegisterProps) {
+
+  const { register, handleSubmit } = useForm<RegisterData>({
+    resolver: zodResolver(registerSchema)
+  })
+
+  async function onSubmit(data: RegisterData) {
+    console.log(data)
+    await api.post('/user', data)
+    alert('Foi')
+  }
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center  px-6 py-12 lg:px-8">
@@ -16,7 +42,7 @@ export function Register({ onChangePage }: RegisterProps) {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label
                 htmlFor="name"
@@ -27,7 +53,7 @@ export function Register({ onChangePage }: RegisterProps) {
               <div className="mt-2">
                 <input
                   id="name"
-                  name="name"
+                  {...register('name')}
                   type="text"
                   autoComplete="name"
                   placeholder="Fulano de Tal"
@@ -47,7 +73,7 @@ export function Register({ onChangePage }: RegisterProps) {
               <div className="mt-2">
                 <input
                   id="phone"
-                  name="phone"
+                  {...register('phone')}
                   type="tel"
                   autoComplete="phone"
                   placeholder="(00)00000-0000"
@@ -70,7 +96,7 @@ export function Register({ onChangePage }: RegisterProps) {
               <div className="mt-2">
                 <input
                   id="password"
-                  name="password"
+                  {...register('password')}
                   type="password"
                   autoComplete="current-password"
                   placeholder="********"
@@ -90,7 +116,7 @@ export function Register({ onChangePage }: RegisterProps) {
               <div className="mt-2">
                 <select
                   id="image-theme"
-                  name="image-theme"
+                  {...register('pictureTheme')}
                   autoComplete="image-theme"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 >
@@ -114,7 +140,7 @@ export function Register({ onChangePage }: RegisterProps) {
               <div className="mt-2">
                 <select
                   id="sentence-theme"
-                  name="sentence-theme"
+                  {...register('phraseTheme')}
                   autoComplete="sentence-name"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 >

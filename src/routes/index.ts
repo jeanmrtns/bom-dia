@@ -26,7 +26,11 @@ routes.post("/user", async (req, res) => {
     const user = await prisma.user.create({
       data: req.body,
     })
-    return res.status(200).json(user)  
+    const id = user.id
+    const token = jwt.sign({ id }, String(process.env.SECRET), {
+      expiresIn: 3600
+    });
+    return res.status(200).json({user, token})  
   }
   catch (err) {
     return res.status(500).json({mensagem: "Não foi possível cadastrar o usuário.", erro: err})  
@@ -39,6 +43,17 @@ routes.get("/user", async (req, res) => {
   return res.status(200).json(users)
 })
 
+routes.get("/user-by-token", async (req, res) => {
+  
+  const result = await auth(req.headers['authorization'])
+  if (!result.auth) {
+    return res.status(500).json(result.message);
+  }
+  const prisma = new PrismaClient()
+  const user = await prisma.user.findFirst({where: {id: result.userId}})
+  return res.status(200).json(user)
+})
+
 routes.post('/login', async (req, res) => {
   const prisma = new PrismaClient()
   const user = await prisma.user.findUnique({where: {phone: req.body.phone}})
@@ -49,8 +64,9 @@ routes.post('/login', async (req, res) => {
 
   if(req.body.phone === user.phone && req.body.password === user.password){
     const id = user.id
+    console.log(id)
     const token = jwt.sign({ id }, String(process.env.SECRET), {
-      expiresIn: 3600 // expires in 1 hour
+      expiresIn: 3600
     });
     return res.json({ auth: true, token: token });
   }
@@ -80,15 +96,19 @@ routes.put('/user/:id', async (req, res) => {
 })
 
 async function auth(token: string | undefined) {
+  let user
   if (token) {
     jwt.verify(token.split(' ')[1], String(process.env.SECRET), function(err, decoded) {
       if (err) return { auth: false, message: 'Token não aceito.' }
     })
+    let decoded: any = jwt.decode(token.split(' ')[1], {complete: true});
+    let payload = decoded.payload.id
+    //let user = payload?.user
+    return { auth: true, message: 'Usuário autorizado.', userId: payload }
   }
   else {
     return { auth: false, message: 'Sem token de autenticação.' }
   }
-  return { auth: true, message: 'Usuário autorizado.' }
 }
 
 export { routes }

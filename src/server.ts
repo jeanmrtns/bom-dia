@@ -2,6 +2,9 @@ require('dotenv').config()
 import express from 'express'
 import cors from 'cors'
 import { routes } from './routes'
+import { openDb } from './database/configDB'
+
+openDb();
 
 const PORT = process.env.PORT || 3333
 

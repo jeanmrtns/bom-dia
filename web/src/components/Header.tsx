@@ -1,12 +1,18 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment } from 'react'
 import * as Avatar from '@radix-ui/react-avatar'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import sun from '@/assets/sun.webp'
 import Image from 'next/image'
 import Link from 'next/link'
-import { destroyCookie, parseCookies } from 'nookies'
+import { destroyCookie } from 'nookies'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/lib/api'
+
+interface GetUserResponse {
+  name: string
+}
 
 const navigation = [{ name: 'Configurações', href: '/account', current: true }]
 
@@ -16,18 +22,18 @@ function classNames(...classes: any) {
 
 export default function Header() {
   const router = useRouter()
-  const cookies = parseCookies()
 
   async function handleSignOut() {
     destroyCookie(null, '@bomdia:token')
-    router.push('/')
+    await router.push('/')
   }
 
-  useEffect(() => {
-    if (!cookies['@bomdia:token']) {
-      router.push('/')
-    }
-  }, [cookies, router])
+  const { data: userName } = useQuery(['userName'], async () => {
+    const response = await api.get<GetUserResponse>('/user-by-token')
+    const data = response.data
+
+    return data.name
+  })
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -95,7 +101,9 @@ export default function Header() {
                       <span className="sr-only">Open user menu</span>
                       <Avatar.Root className="bg-blackA3 inline-flex h-10 w-10 select-none items-center justify-center overflow-hidden rounded-full align-middle">
                         <Avatar.Fallback className="text-violet11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium">
-                          FT
+                          {userName
+                            ? `${userName[0]}${userName[1]}`.toUpperCase()
+                            : ''}
                         </Avatar.Fallback>
                       </Avatar.Root>
                     </Menu.Button>

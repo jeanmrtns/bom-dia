@@ -3,7 +3,7 @@ import { RequestImage } from '../use-cases/request-image'
 import { RequestPhrase } from '../use-cases/request-phrase'
 import { ManageImage } from '../use-cases/manage-image'
 import jwt from 'jsonwebtoken';
-import { PrismaClient, Prisma } from '@prisma/client'
+import { prisma } from '../lib/prisma';
 
 const routes = express.Router()
 
@@ -22,7 +22,6 @@ routes.post("/custom-image", async (req, res) => {
 
 routes.post("/user", async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const user = await prisma.user.create({
       data: req.body,
     })
@@ -38,24 +37,20 @@ routes.post("/user", async (req, res) => {
 })
 
 routes.get("/user", async (req, res) => {
-  const prisma = new PrismaClient()
   const users = await prisma.user.findMany()
   return res.status(200).json(users)
 })
 
 routes.get("/user-by-token", async (req, res) => {
-  
-  const result = await auth(req.headers['authorization'])
+  const result = await auth(req.headers.authorization)
   if (!result.auth) {
     return res.status(500).json(result.message);
   }
-  const prisma = new PrismaClient()
   const user = await prisma.user.findFirst({where: {id: result.userId}})
   return res.status(200).json(user)
 })
 
 routes.post('/login', async (req, res) => {
-  const prisma = new PrismaClient()
   const user = await prisma.user.findUnique({where: {phone: req.body.phone}})
   
   if (!user) {
@@ -80,7 +75,6 @@ routes.put('/user/:id', async (req, res) => {
     return res.status(500).json(result.message);
   } 
 
-  const prisma = new PrismaClient()
   const updateUser = await prisma.user.update({
     where: {
       id: parseInt(req.params.id),

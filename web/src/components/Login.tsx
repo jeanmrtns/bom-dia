@@ -29,18 +29,22 @@ export function Login({ onChangePage }: LoginProps) {
   })
 
   async function onSubmit(data: LoginData) {
-    const response = await api.post<LoginResponse>('/login', data)
-    const { token } = response.data
-    toast.success(
-      'Login realizado. Por favor aguarde enquanto te redirecionamos.',
-    )
+    try {
+      const response = await api.post<LoginResponse>('/login', data)
+      const { token } = response.data
+      toast.success(
+        'Login realizado. Por favor aguarde enquanto te redirecionamos.',
+      )
 
-    setCookie(null, '@bomdia:token', token, {
-      maxAge: 30 * 24 * 60 * 60,
-      path: '*',
-    })
+      setCookie(null, '@bomdia:token', token, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '*',
+      })
 
-    router.push('/account')
+      router.push('/account')
+    } catch (e) {
+      toast.error('Credenciais inválidas!')
+    }
   }
 
   return (

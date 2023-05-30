@@ -8,14 +8,21 @@ import { prisma } from '../lib/prisma';
 const routes = express.Router()
 
 routes.post("/custom-image", async (req, res) => {
-  const { imageTheme, term } = req.body
+  // const { imageTheme, term } = req.body
   const requestImage = new RequestImage()
   const manageImage = new ManageImage()
   const requestPhrase = new RequestPhrase()
-  
-  const phrase = await requestPhrase.execute(term)
-  await requestImage.execute(imageTheme)  
-  await manageImage.execute(phrase)
+  const users = await prisma.user.findMany()
+
+  users.forEach(async (user) => {
+    const { phraseTheme, pictureTheme, phone } = user
+    
+    const phrase = await requestPhrase.execute(phraseTheme)
+    await requestImage.execute(pictureTheme)  
+    await manageImage.execute(phrase)
+  })
+
+
 
 	return res.status(200).json({ status: 'ok' })
 })

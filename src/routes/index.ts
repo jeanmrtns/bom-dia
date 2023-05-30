@@ -23,7 +23,7 @@ routes.post("/custom-image", async (req, res) => {
     const phrase = await requestPhrase.execute(phraseTheme)
     await requestImage.execute(pictureTheme)  
     await manageImage.execute(phrase)
-    await sendImage.send()
+    await sendImage.send(phone)
   })
 
 	return res.status(200).json({ status: 'ok' })

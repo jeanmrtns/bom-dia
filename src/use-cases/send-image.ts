@@ -1,17 +1,19 @@
-const axios = require('axios')
+import axios from 'axios'
 import fs from 'fs'
 import FormData from "form-data";
 
+const senderId = '115781484817417'
+
 export class SendImage {
-    async send(){
+    async send(phoneNumber: String){
         try {
-            const accessToken = "EAAbZB7Pov0w4BAHEZC26vWAZCZB4kPQFz7sUh1pXiFwAfTdl7gV127eIBfOTFFqAs3reblZBynLkdFEbH9CZC7q5XNMVTtpflDELRZCDxDHoLOmlZC83nmZCbbzVTA1MN1l4esx0EiR7lNeOmBExD2tVZAwUX8esZAZBmdu3AwLpMpcZCxmq0aOf0XK4POdUzpQJRXo4EFBBZBYMxt5AZDZD"
+            const accessToken = process.env.WPP_KEY
             const formData = new FormData();
 
             formData.append("file", fs.createReadStream("tmp/saida.png"), { contentType: "image/png"});
             formData.append("messaging_product", "whatsapp");
             const uploadRequest = await axios.post(
-                `https://graph.facebook.com/v14.0/115781484817417/media`,
+                `https://graph.facebook.com/v17.0/${senderId}/media`,
                 formData,
                 {
                 headers: {
@@ -31,18 +33,18 @@ export class SendImage {
             const body = {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": "5519989273515",
+                "to": `55${phoneNumber}`,
                 "type": "image",
                 "image": {
                     "id" : mediaId
                 }
             }
-			const url = `https://graph.facebook.com/v16.0/115781484817417/messages`
+			const url = `https://graph.facebook.com/v17.0/${senderId}/messages`
 			const sendImageMessage = await axios.post(url, body, config)
-            console.log(sendImageMessage.data);
+            // console.log(sendImageMessage.data);
 
-            // const deleteImage = await axios.get(`https://graph.facebook.com/v16.0/${mediaId}`, { headers: { Authorization: accessToken } }) //dando erro
-            // console.log(deleteImage.data);
+            const deleteImage = await axios.delete(`https://graph.facebook.com/v17.0/${mediaId}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+            console.log(deleteImage.data);
             
 		} catch (err) {
 			console.error(err)

@@ -1,28 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Postgres no Railway
-//datasource db {
-//  provider = "postgresql"
-//  url      = env("DATABASE_URL")
-//}
-
-//Sqlite
 datasource db {
   provider = "sqlite"
-  url      = "file:./database.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  phone String  @unique
-  name  String
+  id           Int    @id @default(autoincrement())
+  phone        String @unique
+  name         String
   pictureTheme String
-  phraseTheme String
-  password String
+  phraseTheme  String
+  password     String
+
   @@map("users")
-} 
+}

@@ -29,22 +29,6 @@ routes.post("/custom-image", async (req, res) => {
 	return res.status(200).json({ status: 'ok' })
 })
 
-routes.get("/webhook", async (req, res) => {
-  // editar a url do webhook com a nova url gerada pelo quick tunnel do cloudflare
-  console.log(req.query);
-  if(req.query['hub.verify_token'] == "eYToIYNYvbceshe"){
-    console.log("ingual")
-    return res.send(req.query['hub.challenge'])
-  }
-})
-
-routes.post("/webhook", async (req, res) => {
-  // cancelei a assinatura, se quiser usar dnv lembrar de assinar
-  console.log("mensagem de " + req.body.entry[0].changes[0].value.messages[0].from);
-  console.log("conteudo da mensagem: " + req.body.entry[0].changes[0].value.messages[0].text.body);
-  return res.status(200).json({ status: 'ok' })
-})
-
 routes.post("/user", async (req, res) => {
   try {
     const user = await prisma.user.create({
@@ -62,7 +46,16 @@ routes.post("/user", async (req, res) => {
 })
 
 routes.get("/user", async (req, res) => {
-  const users = await prisma.user.findMany()
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      phraseTheme: true,
+      pictureTheme: true,
+      password: false
+    }
+  })
   return res.status(200).json(users)
 })
 
@@ -122,7 +115,6 @@ async function auth(token: string | undefined) {
     })
     let decoded: any = jwt.decode(token.split(' ')[1], {complete: true});
     let payload = decoded.payload.id
-    //let user = payload?.user
     return { auth: true, message: 'Usuário autorizado.', userId: payload }
   }
   else {

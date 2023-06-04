@@ -2,7 +2,7 @@ import axios from 'axios'
 import fs from 'fs'
 import FormData from "form-data";
 
-const senderId = '115781484817417'
+const senderId = process.env.WPP_SENDER_ID;
 
 export class SendImage {
     async send(phoneNumber: String){
@@ -39,13 +39,9 @@ export class SendImage {
                     "id" : mediaId
                 }
             }
-			const url = `https://graph.facebook.com/v17.0/${senderId}/messages`
-			const sendImageMessage = await axios.post(url, body, config)
-            // console.log(sendImageMessage.data);
-
-            const deleteImage = await axios.delete(`https://graph.facebook.com/v17.0/${mediaId}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-            console.log(deleteImage.data);
-            
+			const url = `https://graph.facebook.com/v17.0/${senderId}/messages`;
+			await axios.post(url, body, config);
+            await axios.delete(`https://graph.facebook.com/v17.0/${mediaId}`, { headers: { Authorization: `Bearer ${accessToken}` } });
 		} catch (err) {
 			console.error(err)
 		}
